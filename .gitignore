@@ -1,0 +1,8 @@
+.streamlit/secrets.toml
+.venv/
+node_modules/
+__pycache__/
+*.py[cod]
+data/
+tmp/
+outputs/
