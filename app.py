@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
+import os
 from pathlib import Path
 import sys
 
@@ -20,6 +21,28 @@ EXAMS_DIR = DATA_DIR / "exams"
 PHOTOS_DIR = DATA_DIR / "photos"
 
 st.set_page_config(page_title="MetaboTrack | Maria Helena", page_icon="◒", layout="wide", initial_sidebar_state="expanded")
+
+
+def require_authorized_user() -> None:
+    """Protect the deployed dashboard with Google OIDC and an explicit allowlist."""
+    if os.getenv("METABOTRACK_AUTH_ENABLED") != "true":
+        return
+    if not st.user.is_logged_in:
+        st.title("🩺 MetaboTrack")
+        st.write("Entre com uma conta Google autorizada para acessar o acompanhamento.")
+        if st.button("Entrar com Google", type="primary"):
+            st.login("google")
+        st.stop()
+    email = str(st.user.get("email", "")).lower()
+    allowed = {item.strip().lower() for item in os.getenv("METABOTRACK_ALLOWED_EMAILS", "").split(",") if item.strip()}
+    if email not in allowed:
+        st.error("Esta conta não possui acesso ao acompanhamento.")
+        if st.button("Sair"):
+            st.logout()
+        st.stop()
+
+
+require_authorized_user()
 
 
 def format_number(value: float, decimals: int = 1) -> str:

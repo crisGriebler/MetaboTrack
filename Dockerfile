@@ -10,6 +10,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY --chown=appuser:appuser . .
 USER appuser
+RUN chmod 500 /app/entrypoint.sh
 
 EXPOSE 8080
-CMD ["sh", "-c", "streamlit run app.py --server.address=0.0.0.0 --server.port=${PORT} --server.headless=true"]
+ENTRYPOINT ["/app/entrypoint.sh"]
