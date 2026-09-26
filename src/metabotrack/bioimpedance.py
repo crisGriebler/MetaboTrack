@@ -7,6 +7,7 @@ from datetime import datetime
 from hashlib import sha256
 from pathlib import Path
 import json
+import os
 import re
 import shutil
 import sqlite3
@@ -14,6 +15,18 @@ import subprocess
 import tempfile
 
 from pypdf import PdfReader
+
+
+def cloud_mode() -> bool:
+    """Use managed persistence only when explicitly enabled in Cloud Run."""
+    return os.getenv("METABOTRACK_STORAGE_MODE") == "gcp"
+
+
+def _firestore_collection():
+    from google.cloud import firestore
+
+    patient_id = os.getenv("METABOTRACK_PATIENT_ID", "maria-helena")
+    return firestore.Client().collection("patients").document(patient_id).collection("bioimpedance_exams")
 
 
 METRICS = {
@@ -223,6 +236,17 @@ def initialize_database(database_path: Path) -> None:
 
 def load_confirmed_exams(database_path: Path) -> list[dict[str, object]]:
     """Load saved assessments in chronological order for dashboard charts."""
+    if cloud_mode():
+        documents = _firestore_collection().order_by("evaluated_at").stream()
+        return [
+            {
+                "evaluated_at": document.to_dict()["evaluated_at"],
+                "extraction_method": document.to_dict()["extraction_method"],
+                "source_filename": document.to_dict()["source_filename"],
+                "metrics": document.to_dict()["metrics"],
+            }
+            for document in documents
+        ]
     initialize_database(database_path)
     with sqlite3.connect(database_path) as connection:
         rows = connection.execute(
@@ -251,6 +275,21 @@ def save_initial_exam_if_missing(
     metrics: dict[str, float],
 ) -> None:
     """Register a previously reviewed assessment once, without duplicating it."""
+    if cloud_mode():
+        document_id = f"initial-{evaluated_at.date().isoformat()}-{sha256(source_filename.encode()).hexdigest()[:10]}"
+        document = _firestore_collection().document(document_id)
+        if not document.get().exists:
+            document.set(
+                {
+                    "evaluated_at": evaluated_at,
+                    "extraction_method": "Registro inicial revisado",
+                    "source_filename": source_filename,
+                    "source_sha256": f"initial-{evaluated_at.date().isoformat()}",
+                    "metrics": metrics,
+                    "saved_at": datetime.now(),
+                }
+            )
+        return
     initialize_database(database_path)
     with sqlite3.connect(database_path) as connection:
         exists = connection.execute(
@@ -287,8 +326,29 @@ def save_confirmed_exam(
     metrics: dict[str, float],
 ) -> None:
     """Persist only user-confirmed values and keep a local copy of the source file."""
-    initialize_database(database_path)
     digest = sha256(source_bytes).hexdigest()
+    if cloud_mode():
+        from google.cloud import storage
+
+        bucket_name = os.environ["METABOTRACK_BUCKET"]
+        patient_id = os.getenv("METABOTRACK_PATIENT_ID", "maria-helena")
+        object_name = f"patients/{patient_id}/bioimpedance/{digest}.pdf"
+        blob = storage.Client().bucket(bucket_name).blob(object_name)
+        if not blob.exists():
+            blob.upload_from_string(source_bytes, content_type="application/pdf")
+        _firestore_collection().add(
+            {
+                "evaluated_at": evaluated_at,
+                "extraction_method": extraction_method,
+                "source_filename": source_filename,
+                "source_sha256": digest,
+                "metrics": metrics,
+                "source_object": object_name,
+                "saved_at": datetime.now(),
+            }
+        )
+        return
+    initialize_database(database_path)
     storage_dir.mkdir(parents=True, exist_ok=True)
     source_path = storage_dir / f"{digest}.pdf"
     if not source_path.exists():
