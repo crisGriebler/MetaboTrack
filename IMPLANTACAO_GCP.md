@@ -7,6 +7,7 @@
 - **Região:** `southamerica-east1` (São Paulo)
 - **Plataforma:** Cloud Run
 - **Escala:** mínimo de 0 e máximo de 1 instância
+- **Concorrência por instância:** 20 requisições
 - **Memória:** 1 GiB
 
 O endpoint é acessível para iniciar o login Google. O dashboard só é apresentado depois de autenticação OAuth e validação da lista de e-mails autorizados.
@@ -40,6 +41,7 @@ A conta de execução não possui papéis administrativos no projeto.
 3. Sem login, a interface apresenta apenas a tela de autenticação, sem dados da paciente.
 4. O arquivo estático do Streamlit retornou `200 application/javascript`.
 5. O Console confirmou o envio de 12 arquivos JPEG e o status `Not public` para as fotos.
+6. O fluxo de carregamento da tela de login foi validado após ajustar a concorrência do Cloud Run; o botão **Entrar com Google** é exibido normalmente.
 
 ## Operação futura
 
