@@ -161,12 +161,12 @@ st.markdown("""
     [data-testid="stSidebar"] * { color: #f5fbfa; }
     .patient-label { color: #78d1c7; font-size: .78rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
     .patient-name { font-size: 1.35rem; font-weight: 700; line-height: 1.25; margin: .3rem 0 1.2rem; }
-    .progress-card { border: 1px solid #3b4650; border-radius: .6rem; min-height: 192px; padding: 1rem; display: flex; flex-direction: column; box-sizing: border-box; }
-    .progress-title { color: #dbe4ea; font-weight: 650; min-height: 1.7rem; }
+    .progress-card { background: #ffffff; border: 1px solid #3b4650; border-radius: .6rem; min-height: 192px; padding: 1rem; display: flex; flex-direction: column; box-sizing: border-box; }
+    .progress-title { color: #1f2937 !important; font-weight: 650; min-height: 1.7rem; }
     .progress-values { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .55rem; }
-    .progress-values span { display: block; color: #aab5c0; font-size: .8rem; margin-bottom: .35rem; }
-    .progress-values strong { display: block; color: #f6f8fb; font-size: 1.48rem; line-height: 1.18; white-space: nowrap; }
-    .progress-variation { color: #bac5ce; font-size: .83rem; margin-top: auto; padding-top: .8rem; }
+    .progress-values span { display: block; color: #4b5563 !important; font-size: .8rem; margin-bottom: .35rem; }
+    .progress-values strong { display: block; color: #111827 !important; font-size: 1.48rem; line-height: 1.18; white-space: nowrap; }
+    .progress-variation { color: #374151 !important; font-size: .83rem; margin-top: auto; padding-top: .8rem; }
 </style>
 """, unsafe_allow_html=True)
 
