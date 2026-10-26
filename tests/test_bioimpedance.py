@@ -1,7 +1,7 @@
 import unittest
 from datetime import date
-from tempfile import TemporaryDirectory
 from pathlib import Path
+import tempfile
 
 from PIL import Image
 
@@ -34,7 +34,9 @@ class BioimpedanceParserTests(unittest.TestCase):
         self.assertEqual(result["gordura_visceral_nivel"], 11.0)
 
     def test_saves_and_lists_a_progress_photo(self):
-        with TemporaryDirectory() as workspace:
+        temp_root = Path(__file__).resolve().parents[1] / "tmp"
+        temp_root.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=temp_root) as workspace:
             image = Image.new("RGB", (4, 4), "white")
             original = Path(workspace) / "photo.jpg"
             image.save(original)

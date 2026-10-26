@@ -155,6 +155,11 @@ exams = exams_frame(load_confirmed_exams(DATABASE_PATH))
 latest_measurement, first_measurement = measurements.iloc[-1], measurements.iloc[0]
 latest_exam, first_exam = exams.iloc[-1], exams.iloc[0]
 
+
+def latest_measurement_with_value(column: str) -> pd.Series:
+    """Return the newest evaluation that contains a value for a given measure."""
+    return measurements.dropna(subset=[column]).iloc[-1]
+
 st.markdown("""
 <style>
     [data-testid="stSidebar"] { background: #123b3e; }
@@ -189,9 +194,11 @@ st.caption("Uma visão amigável das medidas, composição corporal e fotos de e
 st.subheader("✨ Evolução desde o início")
 cards = st.columns(4)
 with cards[0]:
-    progress_metric("⚖️", "Peso", f"{format_number(first_measurement.peso_kg)} kg", f"{format_number(latest_measurement.peso_kg)} kg", delta_text(latest_measurement.peso_kg, first_measurement.peso_kg, "kg"))
+    latest_weight = latest_measurement_with_value("peso_kg")
+    progress_metric("⚖️", "Peso", f"{format_number(first_measurement.peso_kg)} kg", f"{format_number(latest_weight.peso_kg)} kg", delta_text(latest_weight.peso_kg, first_measurement.peso_kg, "kg"))
 with cards[1]:
-    progress_metric("📏", "Cintura / abdômen", f"{format_number(first_measurement.cintura_abdomen_cm)} cm", f"{format_number(latest_measurement.cintura_abdomen_cm)} cm", delta_text(latest_measurement.cintura_abdomen_cm, first_measurement.cintura_abdomen_cm, "cm"))
+    latest_waist = latest_measurement_with_value("cintura_abdomen_cm")
+    progress_metric("📏", "Cintura / abdômen", f"{format_number(first_measurement.cintura_abdomen_cm)} cm", f"{format_number(latest_waist.cintura_abdomen_cm)} cm", delta_text(latest_waist.cintura_abdomen_cm, first_measurement.cintura_abdomen_cm, "cm"))
 with cards[2]:
     progress_metric("🧬", "Gordura corporal", f"{format_number(first_exam.percentual_gordura)}%", f"{format_number(latest_exam.percentual_gordura)}%", delta_text(latest_exam.percentual_gordura, first_exam.percentual_gordura, "p.p."))
 with cards[3]:

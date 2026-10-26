@@ -20,6 +20,7 @@ MEASUREMENTS = [
     {"data": "2026-07-26", "peso_kg": 80.0, "cintura_abdomen_cm": 102.0, "quadril_cm": 119.0, "coxa_direita_cm": 69.0, "coxa_esquerda_cm": 70.0, "braco_direito_cm": 31.0, "braco_esquerdo_cm": 30.0, "busto_cm": 98.0},
     {"data": "2026-08-21", "peso_kg": 76.0, "cintura_abdomen_cm": 96.5, "quadril_cm": 115.0, "coxa_direita_cm": 69.0, "coxa_esquerda_cm": 70.0, "braco_direito_cm": 30.0, "braco_esquerdo_cm": 31.0, "busto_cm": 97.0},
     {"data": "2026-09-18", "peso_kg": 70.7, "cintura_abdomen_cm": 94.0, "quadril_cm": 112.0, "coxa_direita_cm": 64.0, "coxa_esquerda_cm": 64.5, "braco_direito_cm": 30.0, "braco_esquerdo_cm": 29.0, "busto_cm": 95.0},
+    {"data": "2026-10-25", "peso_kg": None, "cintura_abdomen_cm": 86.0, "quadril_cm": 107.0, "coxa_direita_cm": 61.0, "coxa_esquerda_cm": 60.0, "braco_direito_cm": 28.5, "braco_esquerdo_cm": 28.0, "busto_cm": 90.0},
 ]
 
 INITIAL_EXAMS = [
