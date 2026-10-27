@@ -53,7 +53,6 @@ def save_photo(
     suffix = Path(original_name).suffix.lower() or ".jpg"
     if suffix not in {".jpg", ".jpeg", ".png", ".webp"}:
         raise ValueError("Formato não suportado. Envie JPG, JPEG, PNG ou WEBP.")
-    storage_dir.mkdir(parents=True, exist_ok=True)
     digest = sha256(content).hexdigest()[:12]
     destination = storage_dir / f"{captured_on.isoformat()}_{direction}_{digest}{suffix}"
     if _cloud_mode():
@@ -64,6 +63,7 @@ def save_photo(
             content, content_type=Image.MIME.get(Image.open(BytesIO(content)).format, "image/jpeg")
         )
         return destination
+    storage_dir.mkdir(parents=True, exist_ok=True)
     if not destination.exists():
         destination.write_bytes(content)
     return destination
